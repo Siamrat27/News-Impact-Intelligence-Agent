@@ -1,0 +1,17 @@
+# Phase 1-2: ingest + schema
+feedparser>=6.0
+psycopg[binary]>=3.1
+python-dotenv>=1.0
+
+# Phase 5+: NLP / agent graph
+anthropic>=0.40
+langgraph>=0.2
+langchain-anthropic>=0.2
+
+# Phase 10: API
+fastapi>=0.110
+uvicorn[standard]>=0.29
+
+# Embeddings — pick ONE in Phase 5-6 (SPEC §6.2) and uncomment:
+# openai>=1.0        # Option A: text-embedding-3-small (1536 dim)
+# voyageai>=0.2      # Option B: Voyage AI (adjust kb_cases.embedding dim!)
