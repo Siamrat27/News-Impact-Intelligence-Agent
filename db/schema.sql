@@ -62,9 +62,9 @@ create table if not exists sentiment_scores (
 
 -- ---------------------------------------------------------------------------
 -- RAG knowledge base: hand-written historical cases (kb/cases.md).
--- NOTE (open decision, SPEC §4/§6.2): vector(1536) assumes OpenAI
--- text-embedding-3-small. If Voyage or another model is chosen in Phase 5-6,
--- ALTER this column's dimension before building embeddings.
+-- Embedding model (SPEC §6.2, resolved): fastembed BAAI/bge-small-en-v1.5,
+-- 384 dims, local ONNX — free, no API key. If the model ever changes, ALTER
+-- this column's dimension and re-run kb/build_embeddings.py.
 -- ---------------------------------------------------------------------------
 create table if not exists kb_cases (
     id            bigint generated always as identity primary key,
@@ -72,12 +72,13 @@ create table if not exists kb_cases (
     description   text not null,          -- 2-4 sentences: what happened
     market_impact text not null,          -- what followed in the market
     entity_type   text not null,          -- tag: crypto / company / ...
-    embedding     vector(1536)
+    embedding     vector(384)
 );
 
--- ivfflat needs data before it helps; fine to create up front with few lists.
+-- HNSW, not ivfflat: ivfflat trains clusters from rows present at CREATE
+-- INDEX time (an empty table breaks recall); HNSW has no training step.
 create index if not exists idx_kb_cases_embedding
-    on kb_cases using ivfflat (embedding vector_cosine_ops) with (lists = 10);
+    on kb_cases using hnsw (embedding vector_cosine_ops);
 
 -- ---------------------------------------------------------------------------
 -- Agent output: one row per Impact-node assessment, with the RAG audit trail.
@@ -108,3 +109,17 @@ create table if not exists decision_evaluations (
     accuracy_flag        boolean,     -- null = not enough follow-up news yet
     notes                text
 );
+
+-- ---------------------------------------------------------------------------
+-- API lockdown (only needed when sharing a Supabase project, as we do with
+-- pocketflow): RLS on with zero policies denies the auto-generated REST API;
+-- the app connects directly as the table-owning news_agent role, which
+-- bypasses RLS as owner. See CLAUDE.md "Database".
+-- ---------------------------------------------------------------------------
+alter table news_items           enable row level security;
+alter table entities             enable row level security;
+alter table news_entities        enable row level security;
+alter table sentiment_scores     enable row level security;
+alter table kb_cases             enable row level security;
+alter table agent_decisions      enable row level security;
+alter table decision_evaluations enable row level security;

@@ -89,7 +89,7 @@ LangGraph · FastAPI · React + Vite + Ant Design + Recharts
 
 - [x] Phase 1-2 — schema + RSS ingest (verified: 5/5 feeds live, dedup works)
 - [x] Phase 3-4 — SQL analytics layer (`analytics/queries.sql`, all 5 queries <500ms)
-- [ ] Phase 5-6 — knowledge base + RAG (`kb/`)
+- [x] Phase 5-6 — knowledge base + RAG (`kb/`, 18 cases, local fastembed embeddings)
 - [ ] Phase 7-9 — LangGraph multi-agent graph (`agents/`)
 - [ ] Phase 10-11 — FastAPI + React dashboard
 - [ ] Phase 12 — architecture diagram, screenshots, wrap-up

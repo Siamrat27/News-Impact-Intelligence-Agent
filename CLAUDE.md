@@ -26,12 +26,19 @@ criteria pass).
   and are reused by `api/routes/analytics.py` — don't fork divergent
   copies of them into Python strings.
 
-## Open decisions
+## Resolved decisions
 
-- **Embedding model (SPEC §6.2):** not yet chosen. `kb_cases.embedding`
-  is `vector(1536)` (OpenAI text-embedding-3-small assumption). If Voyage
-  is chosen instead, ALTER the column dimension before running
-  `kb/build_embeddings.py`, and update `requirements.txt` + `.env`.
+- **Embedding model (SPEC §6.2):** fastembed `BAAI/bge-small-en-v1.5`
+  (384 dims, local ONNX, free — per user's no-paid-APIs preference).
+  `kb_cases.embedding` is `vector(384)`. Passages use `model.embed()`,
+  queries use `model.query_embed()` (applies the bge query prefix).
+- **LLM provider:** user wants free tiers (Groq etc.), NOT locked to
+  Anthropic despite what SPEC says. All LLM calls go through an
+  env-driven provider layer (`LLM_PROVIDER` in `.env`) — never hardcode
+  a provider or assume `ANTHROPIC_API_KEY` exists.
+- **Vector index:** HNSW, not ivfflat — ivfflat trains its clusters from
+  rows present at CREATE INDEX time, and building it on the empty table
+  silently broke recall (returned 1 of 3 neighbors) until replaced.
 
 ## Environment gotchas
 
