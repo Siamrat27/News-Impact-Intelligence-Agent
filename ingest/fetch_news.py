@@ -31,7 +31,7 @@ from dotenv import load_dotenv
 # on them. Reuters retired its public RSS feeds; MarketWatch stands in as the
 # traditional-markets counterpart.
 RSS_FEEDS = {
-    "coindesk":      "https://www.coindesk.com/arc/outboundfeeds/rss/",
+    "coindesk":      "https://www.coindesk.com/arc/outboundfeeds/rss",  # 308s if trailing slash
     "cointelegraph": "https://cointelegraph.com/rss",
     "cnbc_markets":  "https://www.cnbc.com/id/20910258/device/rss/rss.html",
     "yahoo_finance": "https://finance.yahoo.com/news/rssindex",
