@@ -180,7 +180,15 @@ def impact(state: AgentState) -> AgentState:
 
     retrieved: dict[int, dict] = {}
     for _ in range(MAX_TOOL_ROUNDS):
-        response = llm.invoke(messages)
+        try:
+            response = llm.invoke(messages)
+        except Exception as exc:
+            # e.g. Groq 400 tool_use_failed when the model emits bad tool
+            # args — tell the model what went wrong and let it retry
+            messages.append(HumanMessage(
+                f"Your previous tool call was rejected: {exc}. "
+                f"Fix the arguments (check types) or answer without tools."))
+            continue
         messages.append(response)
         if not response.tool_calls:
             break

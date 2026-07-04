@@ -77,6 +77,19 @@ LangGraph · FastAPI · React + Vite + Ant Design + Recharts
    [analytics/loader.py](analytics/loader.py) — the API reuses these same
    queries.
 
+6. **Run the app** — two terminals:
+
+   ```bash
+   # backend (port 8000)
+   .venv\Scripts\python -m uvicorn api.main:app --reload --port 8000
+   # dashboard (port 5173, proxies /api to the backend)
+   cd dashboard && npm install && npm run dev
+   ```
+
+   Open <http://localhost:5173> — Live Feed, Entity Detail (trend charts),
+   Reasoning Trace (the full headline → sentiment → retrieved cases →
+   impact chain per decision), and Backtest (win-rate).
+
 ### Scheduling options
 
 - **Simple loop (local dev):** `python ingest/fetch_news.py --loop`
@@ -92,7 +105,7 @@ LangGraph · FastAPI · React + Vite + Ant Design + Recharts
 - [x] Phase 5-6 — knowledge base + RAG (`kb/`, 18 cases, local fastembed embeddings)
 - [x] Phase 7-9 — LangGraph multi-agent graph (`agents/`) — code complete;
       end-to-end run needs a free `GROQ_API_KEY` in `.env`
-- [ ] Phase 10-11 — FastAPI + React dashboard
+- [x] Phase 10-11 — FastAPI + React dashboard (4 pages, live data)
 - [ ] Phase 12 — architecture diagram, screenshots, wrap-up
 
 ## Resume bullet drafts (refine after the project is functional)

@@ -28,17 +28,34 @@ def rag_retrieve(query_text: str, k: int = 3) -> list[dict]:
     return _rag(query_text, k)
 
 
+def _resolve_entity(entity: int | str | None) -> int | None:
+    """Accept either a numeric entity id or an entity name."""
+    if entity is None or isinstance(entity, int):
+        return entity
+    text = str(entity).strip()
+    if text.isdigit():
+        return int(text)
+    with get_conn() as conn:
+        row = conn.execute("select id from entities where name ilike %s",
+                           (text,)).fetchone()
+    return row[0] if row else None
+
+
 @tool
-def sql_query(query_name: str, entity_id: int | None = None) -> list[dict]:
+def sql_query(query_name: str, entity: str | None = None) -> list[dict]:
     """Run a named analytics query against the news database. Available:
-    'rolling_sentiment' (recent sentiment trend for entity_id, last 7 days),
-    'volume_spikes' (which entities have unusual news volume right now),
-    'negative_momentum' (entities trending negative over the last 48h).
-    Use this to check the recent data context around an entity."""
+    'rolling_sentiment' (recent sentiment trend for one entity, last 7 days
+    — pass the entity name or id), 'volume_spikes' (which entities have
+    unusual news volume right now), 'negative_momentum' (entities trending
+    negative over the last 48h). Use this to check recent data context."""
     queries = load_queries()
     if query_name not in ("rolling_sentiment", "volume_spikes",
                           "negative_momentum"):
         return [{"error": f"unknown query_name {query_name!r}"}]
+    entity_id = _resolve_entity(entity)
+    if query_name == "rolling_sentiment" and entity_id is None:
+        return [{"error": f"unknown entity {entity!r} — pass a known entity "
+                          f"name or id"}]
     now = datetime.now(timezone.utc)
     params = {
         "rolling_sentiment": {"entity_id": entity_id,
