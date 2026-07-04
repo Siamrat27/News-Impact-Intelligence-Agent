@@ -13,7 +13,7 @@ backtesting.
 
 ## Architecture
 
-```
+```text
 RSS feeds ──► ingest/fetch_news.py ──► Postgres (Supabase + pgvector)
                                             │
               LangGraph agent graph ◄───────┤
@@ -62,6 +62,21 @@ LangGraph · FastAPI · React + Vite + Ant Design + Recharts
    Re-running within 10 minutes is skipped (RSS etiquette); duplicate URLs
    are never inserted twice.
 
+5. **Synthetic dev data + analytics** — real RSS volume is too thin to
+   exercise the analytics windows, so seed ~5,000 marked-synthetic rows:
+
+   ```bash
+   python ingest/generate_synthetic_news.py           # seed
+   python analytics/benchmark.py                      # time the 5 queries (<500ms each)
+   python ingest/generate_synthetic_news.py --purge   # remove synthetic rows
+   ```
+
+   The 5 analytics queries (rolling sentiment, volume-spike detection,
+   negative momentum, decision follow-up, win-rate) live in
+   [analytics/queries.sql](analytics/queries.sql) and are parsed by
+   [analytics/loader.py](analytics/loader.py) — the API reuses these same
+   queries.
+
 ### Scheduling options
 
 - **Simple loop (local dev):** `python ingest/fetch_news.py --loop`
@@ -72,8 +87,8 @@ LangGraph · FastAPI · React + Vite + Ant Design + Recharts
 
 ## Project status
 
-- [x] Phase 1-2 — schema + RSS ingest (scaffolded; feed URLs need live verification)
-- [ ] Phase 3-4 — SQL analytics layer (`analytics/queries.sql`)
+- [x] Phase 1-2 — schema + RSS ingest (verified: 5/5 feeds live, dedup works)
+- [x] Phase 3-4 — SQL analytics layer (`analytics/queries.sql`, all 5 queries <500ms)
 - [ ] Phase 5-6 — knowledge base + RAG (`kb/`)
 - [ ] Phase 7-9 — LangGraph multi-agent graph (`agents/`)
 - [ ] Phase 10-11 — FastAPI + React dashboard
