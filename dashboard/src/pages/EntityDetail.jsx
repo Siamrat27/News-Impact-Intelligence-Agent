@@ -36,7 +36,7 @@ export default function EntityDetail() {
     if (!entityId) return
     setTrend(null)
     api.entityTrend(entityId).then(setTrend)
-      .catch(() => setTrend({ sentiment: [], volume: [] }))
+      .catch((e) => { message.error(String(e)); setTrend({ sentiment: [], volume: [] }) })
   }, [entityId])
 
   const sentimentData = useMemo(() => thin(

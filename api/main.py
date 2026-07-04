@@ -30,6 +30,12 @@ app.include_router(decisions.router)
 app.include_router(analytics.router)
 
 
+@app.on_event("startup")
+def warm_pool() -> None:
+    from api.db import _pool
+    _pool()  # open DB connections now, not on the first request
+
+
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}

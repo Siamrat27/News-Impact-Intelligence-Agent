@@ -13,19 +13,31 @@ backtesting.
 
 ## Architecture
 
-```text
-RSS feeds ──► ingest/fetch_news.py ──► Postgres (Supabase + pgvector)
-                                            │
-              LangGraph agent graph ◄───────┤
-              Monitor ► Sentiment ► Impact ► Log
-              (Impact node calls rag_retrieve over kb_cases)
-                                            │
-              FastAPI ◄─────────────────────┘
-                 │
-              React dashboard (Vite + Ant Design + Recharts)
-```
+![Architecture](docs/architecture.svg)
 
 See [SPEC.md](SPEC.md) for the full engineering spec and phase plan.
+
+## Screenshots
+
+### Reasoning Trace — the core demo
+
+For every decision, the full agentic chain: news item → LLM sentiment →
+which historical cases the model chose to retrieve (RAG audit trail) →
+impact score, confidence, and reasoning that cites those cases by name.
+
+![Reasoning Trace](docs/screen-reasoning-trace.png)
+
+### Live Feed
+
+![Live Feed](docs/screen-live-feed.png)
+
+### Entity Detail
+
+![Entity Detail](docs/screen-entity-detail.png)
+
+### Backtest
+
+![Backtest](docs/screen-backtest.png)
 
 ## Tech stack
 
@@ -106,17 +118,22 @@ LangGraph · FastAPI · React + Vite + Ant Design + Recharts
 - [x] Phase 7-9 — LangGraph multi-agent graph (`agents/`) — code complete;
       end-to-end run needs a free `GROQ_API_KEY` in `.env`
 - [x] Phase 10-11 — FastAPI + React dashboard (4 pages, live data)
-- [ ] Phase 12 — architecture diagram, screenshots, wrap-up
+- [x] Phase 12 — architecture diagram, screenshots, wrap-up
 
-## Resume bullet drafts (refine after the project is functional)
+## Resume bullets
 
-- **Shopee-leaning:** Built a news-intelligence pipeline in Python +
-  Postgres that ingests multi-source RSS data, classifies sentiment with
-  an LLM, and surfaces entity-level trends, volume-spike detection, and
-  decision win-rates through parameterized SQL analytics and a React
-  dashboard.
-- **CyberPay-leaning:** Designed a LangGraph multi-agent system
-  (Monitor → Sentiment → Impact → Log) with real tool-calling and
-  pgvector RAG over hand-curated historical cases, producing
-  confidence-scored market-impact assessments with a fully auditable
-  reasoning trace.
+- **Shopee-leaning (analytics):** Built an end-to-end news-intelligence
+  pipeline (Python, PostgreSQL) ingesting 5 RSS sources with
+  deduplication and rate-limit etiquette; designed 6 parameterized SQL
+  analytics (window-function rolling sentiment, CTE-based volume-spike
+  detection, momentum ranking, self-evaluation backtest) all serving
+  <500 ms over ~5,000 rows, surfaced through a FastAPI + React (Ant
+  Design/Recharts) dashboard.
+- **CyberPay-leaning (agentic AI):** Designed a LangGraph multi-agent
+  system (Monitor → Sentiment → Impact → Log) where the Impact node
+  autonomously decides when and how often to call RAG-retrieval and SQL
+  tools over a pgvector knowledge base of hand-curated historical market
+  cases, producing confidence-scored impact assessments whose reasoning
+  cites retrieved precedents — with the full decision trail (RAG case
+  IDs, sentiment, reasoning) logged to Postgres and rendered as an
+  auditable reasoning-trace UI.

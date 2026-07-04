@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 640" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#898781"/>
+    </marker>
+  </defs>
+
+  <rect width="1060" height="640" fill="#fcfcfb"/>
+  <text x="530" y="36" text-anchor="middle" font-size="20" font-weight="700" fill="#0b0b0b">News Impact Intelligence Agent — Architecture</text>
+  <text x="530" y="56" text-anchor="middle" font-size="12" fill="#898781">Educational demo — not investment advice</text>
+
+  <!-- ============ Sources column ============ -->
+  <rect x="30" y="100" width="170" height="120" rx="8" fill="#ffffff" stroke="#c3c2b7"/>
+  <text x="115" y="122" text-anchor="middle" font-size="13" font-weight="600" fill="#0b0b0b">RSS feeds</text>
+  <text x="115" y="142" text-anchor="middle" font-size="11" fill="#52514e">CoinDesk · CoinTelegraph</text>
+  <text x="115" y="158" text-anchor="middle" font-size="11" fill="#52514e">CNBC · Yahoo Finance</text>
+  <text x="115" y="174" text-anchor="middle" font-size="11" fill="#52514e">MarketWatch</text>
+  <text x="115" y="200" text-anchor="middle" font-size="10" fill="#898781">headline + snippet ≤500 chars only</text>
+
+  <rect x="30" y="430" width="170" height="90" rx="8" fill="#ffffff" stroke="#c3c2b7"/>
+  <text x="115" y="452" text-anchor="middle" font-size="13" font-weight="600" fill="#0b0b0b">kb/cases.md</text>
+  <text x="115" y="472" text-anchor="middle" font-size="11" fill="#52514e">18 hand-written</text>
+  <text x="115" y="488" text-anchor="middle" font-size="11" fill="#52514e">historical market cases</text>
+
+  <!-- ============ Ingest column ============ -->
+  <rect x="250" y="100" width="180" height="120" rx="8" fill="#eef4fc" stroke="#2a78d6"/>
+  <text x="340" y="122" text-anchor="middle" font-size="13" font-weight="600" fill="#0b0b0b">ingest/fetch_news.py</text>
+  <text x="340" y="142" text-anchor="middle" font-size="11" fill="#52514e">feedparser · 10-min cooldown</text>
+  <text x="340" y="158" text-anchor="middle" font-size="11" fill="#52514e">dedup on url</text>
+  <text x="340" y="174" text-anchor="middle" font-size="11" fill="#52514e">(on conflict do nothing)</text>
+
+  <rect x="250" y="430" width="180" height="90" rx="8" fill="#eef4fc" stroke="#2a78d6"/>
+  <text x="340" y="452" text-anchor="middle" font-size="13" font-weight="600" fill="#0b0b0b">kb/build_embeddings.py</text>
+  <text x="340" y="472" text-anchor="middle" font-size="11" fill="#52514e">fastembed bge-small-en-v1.5</text>
+  <text x="340" y="488" text-anchor="middle" font-size="11" fill="#52514e">local ONNX · 384-dim · free</text>
+
+  <!-- ============ Database ============ -->
+  <rect x="480" y="90" width="200" height="440" rx="10" fill="#ffffff" stroke="#2a78d6" stroke-width="2"/>
+  <text x="580" y="116" text-anchor="middle" font-size="14" font-weight="700" fill="#0b0b0b">Postgres (Supabase)</text>
+  <text x="580" y="134" text-anchor="middle" font-size="11" fill="#898781">+ pgvector</text>
+  <g font-size="11.5" fill="#52514e">
+    <rect x="498" y="150" width="164" height="26" rx="4" fill="#f9f9f7"/><text x="580" y="167" text-anchor="middle">news_items</text>
+    <rect x="498" y="182" width="164" height="26" rx="4" fill="#f9f9f7"/><text x="580" y="199" text-anchor="middle">entities · news_entities</text>
+    <rect x="498" y="214" width="164" height="26" rx="4" fill="#f9f9f7"/><text x="580" y="231" text-anchor="middle">sentiment_scores</text>
+    <rect x="498" y="246" width="164" height="26" rx="4" fill="#e8f7f1"/><text x="580" y="263" text-anchor="middle">kb_cases (vector 384, HNSW)</text>
+    <rect x="498" y="278" width="164" height="26" rx="4" fill="#f9f9f7"/><text x="580" y="295" text-anchor="middle">agent_decisions</text>
+    <rect x="498" y="310" width="164" height="26" rx="4" fill="#f9f9f7"/><text x="580" y="327" text-anchor="middle">decision_evaluations</text>
+  </g>
+  <text x="580" y="366" text-anchor="middle" font-size="11" font-weight="600" fill="#0b0b0b">analytics/queries.sql</text>
+  <g font-size="10.5" fill="#52514e">
+    <text x="580" y="384" text-anchor="middle">rolling sentiment · volume spikes</text>
+    <text x="580" y="400" text-anchor="middle">negative momentum · follow-up</text>
+    <text x="580" y="416" text-anchor="middle">win-rate (all &lt;500 ms)</text>
+  </g>
+  <text x="580" y="452" text-anchor="middle" font-size="10.5" fill="#898781">RLS on + dedicated news_agent role</text>
+  <text x="580" y="468" text-anchor="middle" font-size="10.5" fill="#898781">(REST API locked; direct SQL only)</text>
+
+  <!-- ============ Agent ============ -->
+  <rect x="730" y="90" width="180" height="300" rx="10" fill="#fdf6ec" stroke="#eda100" stroke-width="2"/>
+  <text x="820" y="116" text-anchor="middle" font-size="14" font-weight="700" fill="#0b0b0b">LangGraph agent</text>
+  <g font-size="12" fill="#0b0b0b">
+    <rect x="750" y="132" width="140" height="30" rx="6" fill="#ffffff" stroke="#c3c2b7"/><text x="820" y="151" text-anchor="middle">Monitor</text>
+    <rect x="750" y="182" width="140" height="30" rx="6" fill="#ffffff" stroke="#c3c2b7"/><text x="820" y="201" text-anchor="middle">Sentiment</text>
+    <rect x="750" y="232" width="140" height="30" rx="6" fill="#ffffff" stroke="#c3c2b7"/><text x="820" y="251" text-anchor="middle">Impact</text>
+    <rect x="750" y="282" width="140" height="30" rx="6" fill="#ffffff" stroke="#c3c2b7"/><text x="820" y="301" text-anchor="middle">Log</text>
+  </g>
+  <line x1="820" y1="162" x2="820" y2="182" stroke="#898781" marker-end="url(#arrow)"/>
+  <line x1="820" y1="212" x2="820" y2="232" stroke="#898781" marker-end="url(#arrow)"/>
+  <line x1="820" y1="262" x2="820" y2="282" stroke="#898781" marker-end="url(#arrow)"/>
+  <text x="820" y="336" text-anchor="middle" font-size="10.5" fill="#52514e">tools: rag_retrieve · sql_query</text>
+  <text x="820" y="352" text-anchor="middle" font-size="10.5" fill="#52514e">(model decides when/how often)</text>
+  <text x="820" y="374" text-anchor="middle" font-size="10.5" fill="#898781">LLM: env-driven (Groq free tier)</text>
+
+  <!-- ============ API + dashboard ============ -->
+  <rect x="730" y="430" width="180" height="70" rx="8" fill="#eef4fc" stroke="#2a78d6"/>
+  <text x="820" y="454" text-anchor="middle" font-size="13" font-weight="600" fill="#0b0b0b">FastAPI</text>
+  <text x="820" y="472" text-anchor="middle" font-size="10.5" fill="#52514e">news · decisions · analytics</text>
+  <text x="820" y="486" text-anchor="middle" font-size="10.5" fill="#52514e">POST /agent/run</text>
+
+  <rect x="730" y="540" width="180" height="76" rx="8" fill="#e8f7f1" stroke="#1baf7a"/>
+  <text x="820" y="562" text-anchor="middle" font-size="13" font-weight="600" fill="#0b0b0b">React dashboard</text>
+  <text x="820" y="580" text-anchor="middle" font-size="10.5" fill="#52514e">Live Feed · Entity Detail</text>
+  <text x="820" y="594" text-anchor="middle" font-size="10.5" fill="#52514e">Reasoning Trace · Backtest</text>
+  <text x="820" y="608" text-anchor="middle" font-size="10" fill="#898781">Vite + Ant Design + Recharts</text>
+
+  <!-- ============ Arrows ============ -->
+  <line x1="200" y1="160" x2="248" y2="160" stroke="#898781" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="430" y1="160" x2="478" y2="160" stroke="#898781" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="200" y1="475" x2="248" y2="475" stroke="#898781" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="430" y1="470" x2="478" y2="330" stroke="#898781" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- db <-> agent -->
+  <line x1="680" y1="150" x2="728" y2="150" stroke="#898781" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="704" y="140" text-anchor="middle" font-size="9.5" fill="#898781">spike scan</text>
+  <line x1="728" y1="250" x2="680" y2="250" stroke="#898781" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="704" y="240" text-anchor="middle" font-size="9.5" fill="#898781">RAG top-k</text>
+  <line x1="728" y1="300" x2="680" y2="300" stroke="#898781" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="704" y="320" text-anchor="middle" font-size="9.5" fill="#898781">decision +</text>
+  <text x="704" y="332" text-anchor="middle" font-size="9.5" fill="#898781">case ids</text>
+
+  <!-- db -> api -> dashboard -->
+  <line x1="640" y1="530" x2="728" y2="465" stroke="#898781" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="820" y1="500" x2="820" y2="538" stroke="#898781" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="836" y="524" font-size="9.5" fill="#898781">/api proxy</text>
+
+  <!-- dashboard trigger -> agent -->
+  <path d="M 912 578 C 990 578 990 240 912 240" fill="none" stroke="#eda100" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <text x="1000" y="404" text-anchor="middle" font-size="9.5" fill="#c98500" transform="rotate(90 1000 404)">Run agent cycle (manual trigger)</text>
+</svg>
