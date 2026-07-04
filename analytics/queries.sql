@@ -123,6 +123,21 @@ where h.avg_full < 0
 order by momentum asc;
 
 
+-- name: entity_volume
+-- News volume per 6h bucket for one entity (dashboard trend chart).
+-- params: entity_id (int), since (timestamptz), include_synthetic (bool)
+select
+    date_bin('6 hours', n.published_at, timestamptz '2000-01-01') as bucket,
+    count(*) as items
+from news_items n
+join news_entities ne on ne.news_item_id = n.id
+where ne.entity_id = %(entity_id)s
+  and n.published_at >= %(since)s
+  and (%(include_synthetic)s or n.source <> 'synthetic')
+group by bucket
+order by bucket;
+
+
 -- name: decision_follow_up
 -- §6.1.4 Agent self-evaluation: for each decision, the average sentiment of
 -- same-entity news published in the %(horizon_hours)s after the decision,
